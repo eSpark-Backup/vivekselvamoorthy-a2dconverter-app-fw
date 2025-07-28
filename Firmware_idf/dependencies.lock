@@ -1,0 +1,77 @@
+dependencies:
+  espp/ads1x15:
+    component_hash: 13371867cf48f2dc51bcefd0876bcdebf9ddfa6493b5cc193c55a94ffc2945ea
+    dependencies:
+    - name: espp/base_peripheral
+      registry_url: https://components.espressif.com
+      require: private
+      version: '>=1.0'
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.0.17
+  espp/base_component:
+    component_hash: f4224d4295dab7b61a2a20c8897bc1f502ee692aaa829c818dd416fa2e3c2dfd
+    dependencies:
+    - name: espp/logger
+      registry_url: https://components.espressif.com
+      require: private
+      version: '>=1.0'
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 1.0.17
+  espp/base_peripheral:
+    component_hash: 4be28f02f31e77442d37dd6f63b1998957c321aa2928015c8db38203188db8f6
+    dependencies:
+    - name: espp/base_component
+      registry_url: https://components.espressif.com
+      require: private
+      version: '>=1.0'
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 1.0.17
+  espp/format:
+    component_hash: fe1248e361db8e2ac39048ed7e3406087c8bbc4dc952a6020bc76080bc8a226e
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 1.0.17
+  espp/logger:
+    component_hash: 407e34218f43a3980953ca805f5e81515757fcefafa3ab763163518162ba7572
+    dependencies:
+    - name: espp/format
+      registry_url: https://components.espressif.com
+      require: private
+      version: '>=1.0'
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 1.0.17
+  idf:
+    source:
+      type: idf
+    version: 5.4.2
+direct_dependencies:
+- espp/ads1x15
+- idf
+manifest_hash: a09212ea4f110e50a49120ab28cacb032e39e0bf7a67296e3d7501d89f2047d7
+target: esp32
+version: 2.0.0

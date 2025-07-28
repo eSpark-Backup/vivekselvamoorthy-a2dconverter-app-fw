@@ -121,12 +121,12 @@ void setup() {
 char buffer[12];
 void loop() {
 
-  value0 = readAdsValue(ADS1115_MUX_AIN1_GND);
-  float vol = value0 / 279.0; // scale it properly
-  // value1 = readAdsValue(ADS1115_MUX_AIN0_GND);
+  value0 = readAdsValue(ADS1115_MUX_AIN0_GND);
+  // float vol = value0 / 279.0; // scale it properly
+  value1 = readAdsValue(ADS1115_MUX_AIN1_GND);
   // value2 = readAdsValue(ADS1115_MUX_AIN2_GND);
   // value3 = readAdsValue(ADS1115_MUX_AIN3_GND);
-
+  printf("val AN0: %d AN1: %d \n",value0,value1);
   // printf("val AN0: %d AN1: %d AN2: %d and AN3: %d\n",value0,value1,value2,value3);
 
   if (deviceConnected) {

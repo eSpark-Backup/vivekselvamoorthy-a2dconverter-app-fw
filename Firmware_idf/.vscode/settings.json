@@ -1,0 +1,20 @@
+{
+    "idf.espIdfPathWin": "C:\\Users\\eSpark\\esp\\v5.4.2\\esp-idf",
+    "idf.toolsPathWin": "C:\\Users\\eSpark\\.espressif",
+    "idf.pythonInstallPath": "c:\\Users\\eSpark\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
+    "files.associations": {
+        "*.html": "html",
+        "string.h": "c",
+        "stdio.h": "c",
+        "ads111x.h": "c",
+        "sdkconfig.h": "c",
+        "chrono": "c",
+        "functional": "c",
+        "mutex": "c",
+        "ble_handler.h": "c",
+        "compare": "c",
+        "cstdint": "c",
+        "ads1115_readings.h": "c"
+    },
+    "idf.portWin": "COM38"
+}
