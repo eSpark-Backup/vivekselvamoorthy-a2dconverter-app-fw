@@ -14,7 +14,8 @@
         "ble_handler.h": "c",
         "compare": "c",
         "cstdint": "c",
-        "ads1115_readings.h": "c"
+        "ads1115_readings.h": "c",
+        "random": "cpp"
     },
     "idf.portWin": "COM38"
 }

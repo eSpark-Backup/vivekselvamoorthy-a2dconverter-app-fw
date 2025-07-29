@@ -39,19 +39,15 @@
 
 ///Declare the static function
 static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
-// static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
+
 
 #define GATTS_SERVICE_UUID_TEST_A   0x00FF
 #define GATTS_CHAR_UUID_TEST_A      0xFF01
 #define GATTS_DESCR_UUID_TEST_A     0x3333
 #define GATTS_NUM_HANDLE_TEST_A     4
-
-// #define GATTS_SERVICE_UUID_TEST_B   0x00EE
-// #define GATTS_CHAR_UUID_TEST_B      0xEE01
-// #define GATTS_DESCR_UUID_TEST_B     0x2222
-// #define GATTS_NUM_HANDLE_TEST_B     4
-
-static char test_device_name[ESP_BLE_ADV_NAME_LEN_MAX] = "ESP_GATTS_DEMO";
+#define DEVICE_NAME_LEN 23
+// const uint8_t* mac = esp_bt_dev_get_address();
+// static char test_device_name[DEVICE_NAME_LEN] = "ESP_{mac}";
 
 #define TEST_MANUFACTURER_DATA_LEN  17
 
@@ -68,7 +64,7 @@ static uint16_t descr_value = 0x0;
  * This simplified implementation assumes a single connection.
  * For multi-connection scenarios, the MTU should be stored per connection ID.
  */
-static uint16_t local_mtu = 23;
+static uint16_t local_mtu = 512;
 #define CONFIG_EXAMPLE_CHAR_READ_DATA_LEN 4
 static uint8_t char_value_read[CONFIG_EXAMPLE_CHAR_READ_DATA_LEN] = {0xDE,0xED,0xBE,0xEF};
 
@@ -334,10 +330,19 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         gl_profile_tab[PROFILE_A_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_16;
         gl_profile_tab[PROFILE_A_APP_ID].service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_TEST_A;
 
+        // snprintf(test_device_name, DEVICE_NAME_LEN, "ESP_%02X%02X%02X", mac[3], mac[4], mac[5]);
+        const uint8_t *mac = esp_bt_dev_get_address();
+        static char test_device_name[DEVICE_NAME_LEN];
+        snprintf(test_device_name, DEVICE_NAME_LEN,
+             "ESP_%02X:%02X:%02X:%02X:%02X:%02X",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        ESP_LOGI("BLE", "Device name set to: %s", test_device_name);
         esp_err_t set_dev_name_ret = esp_ble_gap_set_device_name(test_device_name);
+        
         if (set_dev_name_ret){
             ESP_LOGE(GATTS_TAG, "set device name failed, error code = %x", set_dev_name_ret);
-        }
+        
+}
 #ifdef CONFIG_EXAMPLE_SET_RAW_ADV_DATA
         esp_err_t raw_adv_ret = esp_ble_gap_config_adv_data_raw(raw_adv_data, sizeof(raw_adv_data));
         if (raw_adv_ret){
@@ -426,37 +431,17 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                 if (descr_value == 0x0001 || descr_value == 0x0002){
                     if (a_property & ESP_GATT_CHAR_PROP_BIT_NOTIFY || a_property & ESP_GATT_CHAR_PROP_BIT_INDICATE){
                         ESP_LOGI(GATTS_TAG, "Notification enable");
-                        uint8_t notify_data[256];
-                        // for (int i = 0; i < sizeof(notify_data); ++i)
-                        // {
-                        //     notify_data[i] = i*2;
-                        // }
-                        // //the size of notify_data[] need less than MTU size
-                        // esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, gl_profile_tab[PROFILE_A_APP_ID].char_handle,
-                        //                         sizeof(notify_data), notify_data, false);
-                        
-                        get_sensor_data_json((char *)notify_data, sizeof(notify_data));
-
-                        esp_ble_gatts_send_indicate(gatts_if,param->write.conn_id,
-                                    gl_profile_tab[PROFILE_A_APP_ID].char_handle,
-                                    sizeof(notify_data),
-                                    (uint8_t *)notify_data,
-                                    false);
+                        uint8_t notify_data[200] = {0}; 
+                        int json_len = get_sensor_data_json((char *)notify_data, sizeof(notify_data));
+                        ESP_LOGI(GATTS_TAG, " JSON length: %d", json_len);
+                        ESP_LOGI(GATTS_TAG, "Sending JSON: %s", notify_data);
+                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id,
+                            gl_profile_tab[PROFILE_A_APP_ID].char_handle,
+                            json_len, // Actual JSON length
+                            notify_data,
+                            false);
                     }
                 }
-                // else if (descr_value == 0x0002){
-                //     if (){
-                //         ESP_LOGI(GATTS_TAG, "Indication enable");
-                //         uint8_t indicate_data[15];
-                //         for (int i = 0; i < sizeof(indicate_data); ++i)
-                //         {
-                //             indicate_data[i] = i%0xff;
-                //         }
-                //         //the size of indicate_data[] need less than MTU size
-                //         esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, gl_profile_tab[PROFILE_A_APP_ID].char_handle,
-                //                                 sizeof(indicate_data), indicate_data, true);
-                //     }
-                // }
                 else if (descr_value == 0x0000){
                     ESP_LOGI(GATTS_TAG, "Notification/Indication disable");
                 }else{
@@ -555,7 +540,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         ESP_LOGI(GATTS_TAG, "Disconnected, remote "ESP_BD_ADDR_STR", reason 0x%02x",
                  ESP_BD_ADDR_HEX(param->disconnect.remote_bda), param->disconnect.reason);
         esp_ble_gap_start_advertising(&adv_params);
-        local_mtu = 23; // Reset MTU for a single connection
+        local_mtu = 512; // Reset MTU for a single connection
         break;
     case ESP_GATTS_CONF_EVT:
         ESP_LOGI(GATTS_TAG, "Confirm receive, status %d, attr_handle %d", param->conf.status, param->conf.handle);
@@ -585,9 +570,9 @@ void BLEinit(void)
     }
     ESP_ERROR_CHECK( ret );
 
-    #if CONFIG_EXAMPLE_CI_PIPELINE_ID
-    memcpy(test_device_name, esp_bluedroid_get_example_name(), ESP_BLE_ADV_NAME_LEN_MAX);
-    #endif
+    // #if CONFIG_EXAMPLE_CI_PIPELINE_ID
+    // memcpy(test_device_name, esp_bluedroid_get_example_name(), ESP_BLE_ADV_NAME_LEN_MAX);
+    // #endif
 
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
 
@@ -630,11 +615,9 @@ void BLEinit(void)
         ESP_LOGE(GATTS_TAG, "gatts app register error, error code = %x", ret);
         return;
     }
-
-    esp_err_t local_mtu_ret = esp_ble_gatt_set_local_mtu(500);
+    esp_err_t local_mtu_ret = esp_ble_gatt_set_local_mtu(512);
     if (local_mtu_ret){
         ESP_LOGE(GATTS_TAG, "set local  MTU failed, error code = %x", local_mtu_ret);
     }
-
     return;
 }

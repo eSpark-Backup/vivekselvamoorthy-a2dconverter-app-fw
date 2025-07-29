@@ -145,60 +145,24 @@ void readVCC()
     }
 }
 
-void send_ads1115_data_ble()
+int get_sensor_data_json(char *buffer, size_t size)
 {
-    char data_str[256];  // Buffer for the formatted string
-
-    snprintf(data_str, sizeof(data_str),
-             "VOLT_SIG: %d, SWITCH: %d, TACH: %d, TILT_TRIM: %d, OIL_PRESS: %d, COOLANT: %d, "
-             "WARNING: %d, FUEL_1: %d, FUEL_2: %d, STARTER: %d",
-             VOLT_SIG, SWITCH, tach_value, tilt_trim_value, oil_press_value, coolant_value,
-             warning, fuel_1, fuel_2, starter);
-
+    return snprintf(buffer, size,
+        "{"
+        "\"VOLT_SIG\": %d, "
+        "\"SWITCH\": %d, "
+        "\"TACH\": %d, "
+        "\"TILT_TRIM\": %d, "
+        "\"OIL_PRESS\": %d, "
+        "\"COOLANT\": %d, "
+        "\"WARNING\": %d, "
+        "\"FUEL_1\": %d, "
+        "\"FUEL_2\": %d, "
+        "\"STARTER\": %d"
+        "}",
+        VOLT_SIG, SWITCH, tach_value, tilt_trim_value,
+        oil_press_value, coolant_value, warning,
+        fuel_1, fuel_2, starter);
+    //  return snprintf(buffer, size, "This is a test string from ESP32.");
 }
 
-void get_sensor_data_json(char *buffer, size_t size)
-{
-    snprintf(buffer, size,
-             "{"
-             "\"VOLT_SIG\": %d, "
-             "\"SWITCH\": %d, "
-             "\"TACH\": %d, "
-             "\"TILT_TRIM\": %d, "
-             "\"OIL_PRESS\": %d, "
-             "\"COOLANT\": %d, "
-             "\"WARNING\": %d, "
-             "\"FUEL_1\": %d, "
-             "\"FUEL_2\": %d, "
-             "\"STARTER\": %d"
-             "}",
-             VOLT_SIG, SWITCH, tach_value, tilt_trim_value,
-             oil_press_value, coolant_value, warning,
-             fuel_1, fuel_2, starter);
-}
-
-
-// void send_ads1115_data_ble()
-// {
-//     char chunk[64];
-
-//     snprintf(chunk, sizeof(chunk),
-//              "VOLT_SIG: %d, SWITCH: %d\n", VOLT_SIG, SWITCH);
-//     ble_send_string(chunk);
-
-//     snprintf(chunk, sizeof(chunk),
-//              "TACH: %d, TILT_TRIM: %d\n", tach_value, tilt_trim_value);
-//     ble_send_string(chunk);
-
-//     snprintf(chunk, sizeof(chunk),
-//              "OIL_PRESS: %d, COOLANT: %d\n", oil_press_value, coolant_value);
-//     ble_send_string(chunk);
-
-//     snprintf(chunk, sizeof(chunk),
-//              "WARNING: %d, FUEL_1: %d\n", warning, fuel_1);
-//     ble_send_string(chunk);
-
-//     snprintf(chunk, sizeof(chunk),
-//              "FUEL_2: %d, STARTER: %d\n", fuel_2, starter);
-//     ble_send_string(chunk);
-// }

@@ -19,6 +19,6 @@ void init_ads1115();
 void readSCL();
 void readGND();
 void readVCC();
-void get_sensor_data_json(char *buffer, size_t size);
+int  get_sensor_data_json(char *buffer, size_t size);
 
 #endif // ADS1115_READINGS_H
