@@ -5,6 +5,7 @@
 #include "ads1115_readings.h"
 #include "driver/gpio.h"
 #include "ble_handler.h"
+#include "NMEA2000.h"
 
 #define I2C_ENABLE GPIO_NUM_33
 
@@ -23,6 +24,7 @@ void ads111x_test(void *pvParameters)
     
     init_ads1115();
     BLEinit();
+    NMEA_init();
     while (1) {
         readSCL();
         readGND();

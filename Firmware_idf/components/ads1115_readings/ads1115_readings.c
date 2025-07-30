@@ -149,16 +149,16 @@ int get_sensor_data_json(char *buffer, size_t size)
 {
     return snprintf(buffer, size,
         "{"
-        "\"VOLT_SIG\": %d, "
-        "\"SWITCH\": %d, "
-        "\"TACH\": %d, "
-        "\"TILT_TRIM\": %d, "
-        "\"OIL_PRESS\": %d, "
-        "\"COOLANT\": %d, "
-        "\"WARNING\": %d, "
-        "\"FUEL_1\": %d, "
-        "\"FUEL_2\": %d, "
-        "\"STARTER\": %d"
+        "\"VOLT_SIG\":%d,"
+        "\"SWITCH\"  :%d,"
+        "\"TACH\"    :%d,"
+        "\"TILT_TRM\":%d,"
+        "\"OIL_PRES\":%d,"
+        "\"COOLANT\" :%d,"
+        "\"WARNING\" :%d,"
+        "\"FUEL_1\"  :%d,"
+        "\"FUEL_2\"  :%d,"
+        "\"STARTER\" :%d"
         "}",
         VOLT_SIG, SWITCH, tach_value, tilt_trim_value,
         oil_press_value, coolant_value, warning,
