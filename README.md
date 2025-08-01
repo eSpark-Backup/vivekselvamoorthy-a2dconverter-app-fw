@@ -30,14 +30,14 @@ This document provides the Bluetooth Low Energy (BLE) **Service** and **Characte
 ## Connection Behavior
 
 - **Peripheral Role:** Advertises service on startup
-- **MTU Size:** 512 bytes (negotiable)
+- **MTU Size:** 512 bytes (dynamic)
 - **Preferred Connection Interval:** 7.5–20 ms
 
 ---
 
 ## Example Workflow
 
-1. **Scan for device** named `ESP{MAC_ADDRESS}`.
+1. **Scan for device** named `ESP_{MAC_ADDRESS}`.
 2. **Connect** and discover services.
 3. **Enable notifications** .
   
