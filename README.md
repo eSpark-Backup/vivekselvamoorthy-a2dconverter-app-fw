@@ -30,7 +30,7 @@ This document provides the Bluetooth Low Energy (BLE) **Service** and **Characte
 ## Connection Behavior
 
 - **Peripheral Role:** Advertises service on startup
-- **MTU Size:** 512 bytes (negotiable)
+- **MTU Size:** 512 bytes (dynamic)
 - **Preferred Connection Interval:** 7.5–20 ms
 
 ---
