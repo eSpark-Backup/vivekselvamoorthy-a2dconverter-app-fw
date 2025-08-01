@@ -24,7 +24,7 @@ void ads111x_test(void *pvParameters)
     
     init_ads1115();
     BLEinit();
-    NMEA_init();
+    // NMEA_init();
     while (1) {
         readSCL();
         readGND();

@@ -20,7 +20,16 @@
         "string": "c",
         "string_view": "c",
         "ranges": "c",
-        "span": "c"
+        "span": "c",
+        "optional": "c",
+        "ratio": "c",
+        "system_error": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "charconv": "c",
+        "expected": "c",
+        "format": "c"
     },
     "idf.portWin": "COM38"
 }
