@@ -37,7 +37,7 @@ This document provides the Bluetooth Low Energy (BLE) **Service** and **Characte
 
 ## Example Workflow
 
-1. **Scan for device** named `ESP{MAC_ADDRESS}`.
+1. **Scan for device** named `ESP_{MAC_ADDRESS}`.
 2. **Connect** and discover services.
 3. **Enable notifications** .
   
