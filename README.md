@@ -25,15 +25,6 @@ This document provides the Bluetooth Low Energy (BLE) **Service** and **Characte
   - Enable notifications on the characteristic
 ---
 
-## BLE COMMANDS: structure and usage
-
-Hex Code | Command | Type | Input | Response Format | Description
--- | -- | -- | -- | -- | --
-
-0x0D | Set Presence Detection Duration | Set | 0x0D | 0x0D [DURATION_VALUE] | Sets the duration after which module returns no detection. Value Range: 0x00-0xFF
-0x0E | Get Presence Detection Range | Get | 0x0E | 0x0E [GATE_RESOLUTION] [NUMBER_OF_ACTIVATE_GATES] [SENSOR_RANGE] | Gets the gate resolution ,number of active gates, and the total sensor range
-
-
 ---
 
 ## Connection Behavior
