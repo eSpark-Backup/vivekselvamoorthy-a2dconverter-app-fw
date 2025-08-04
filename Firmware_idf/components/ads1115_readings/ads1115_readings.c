@@ -85,7 +85,9 @@ void readSCL()
     vTaskDelay(pdMS_TO_TICKS(100));
     if (ads111x_get_value(&devicesSCL, &VOLT_SIG) == ESP_OK)
     {
-        float voltage = gain_val / ADS111X_MAX_VALUE * VOLT_SIG;
+        float voltage = (VOLT_SIG / 32767.0) * 6.15f;
+        voltage = voltage * 1.4f ;
+
         printf("AIN0 (VOLT Signal) value: %d, voltage: %.02f volts\n", VOLT_SIG, voltage);
     }
 
