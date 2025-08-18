@@ -43,7 +43,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
 
 #define GATTS_SERVICE_UUID_TEST_A   0x00FF
 #define GATTS_CHAR_UUID_TEST_A      0xFF01
-#define GATTS_DESCR_UUID_TEST_A     0x2902
+#define GATTS_DESCR_UUID_TEST_A     0x2903
 #define GATTS_NUM_HANDLE_TEST_A     4
 #define DEVICE_NAME_LEN 23
 // const uint8_t* mac = esp_bt_dev_get_address();
@@ -58,6 +58,11 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
 static uint8_t char1_str[] = {0x11,0x22,0x33};
 
 static uint16_t descr_value = 0x0;
+
+static bool notify_enabled = false;
+static uint16_t g_conn_id = 0;
+static uint16_t g_handler = 0;
+static uint16_t g_if = 0; 
 /**
  * Current MTU size for the active connection.
  *
@@ -431,25 +436,47 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                 if (descr_value == 0x0001 || descr_value == 0x0002){
                     if (a_property & ESP_GATT_CHAR_PROP_BIT_NOTIFY || a_property & ESP_GATT_CHAR_PROP_BIT_INDICATE){
                         ESP_LOGI(GATTS_TAG, "Notification enable");
-                        uint8_t notify_data[200] = {0}; 
-                        int json_len = get_sensor_data_json((char *)notify_data, sizeof(notify_data));
-                        ESP_LOGI(GATTS_TAG, " JSON length: %d", json_len);
-                        ESP_LOGI(GATTS_TAG, "Sending JSON: %s", notify_data);
-                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id,
-                            gl_profile_tab[PROFILE_A_APP_ID].char_handle,
-                            json_len, // Actual JSON length
-                            notify_data,
-                            false);
-                    }
+                        notify_enabled = true;
+                        g_if =gatts_if;
+                        g_conn_id = param->write.conn_id;
+                        g_handler = gl_profile_tab[PROFILE_A_APP_ID].char_handle;
+                        // uint8_t notify_data[200] = {0}; 
+                        // int json_len = get_sensor_data_json((char *)notify_data, sizeof(notify_data));
+                        // ESP_LOGI(GATTS_TAG, " JSON length: %d", json_len);
+                        // ESP_LOGI(GATTS_TAG, "Sending JSON: %s", notify_data);
+                        // esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id,
+                        //     gl_profile_tab[PROFILE_A_APP_ID].char_handle,
+                        //     json_len, // Actual JSON length
+                        //     notify_data,
+                        //     false);
                 }
+
+
                 else if (descr_value == 0x0000){
                     ESP_LOGI(GATTS_TAG, "Notification/Indication disable");
+                    // notify_enabled = false;
                 }else{
                     ESP_LOGE(GATTS_TAG, "Unknown descriptor value");
                     ESP_LOG_BUFFER_HEX(GATTS_TAG, param->write.value, param->write.len);
                 }
 
+                   if (notify_enabled) {
+                         uint8_t notify_data[200] = {0};
+                        //  g_if = gatts_if;
+                        //  g_conn_id = param->write.conn_id;
+                        int json_len = get_sensor_data_json((char *)notify_data, sizeof(notify_data));
+                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id,
+                        gl_profile_tab[PROFILE_A_APP_ID].char_handle,
+                        json_len, // Actual JSON length
+                        notify_data,
+                        false);
+                    }
+
             }
+
+            }
+
+
         }
         example_write_event_env(gatts_if, &a_prepare_write_env, param);
         break;
@@ -532,6 +559,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         ESP_LOGI(GATTS_TAG, "Connected, conn_id %u, remote "ESP_BD_ADDR_STR"",
                  param->connect.conn_id, ESP_BD_ADDR_HEX(param->connect.remote_bda));
         gl_profile_tab[PROFILE_A_APP_ID].conn_id = param->connect.conn_id;
+        gl_profile_tab[PROFILE_A_APP_ID].gatts_if = gatts_if;
         //start sent the update connection parameters to the peer device.
         esp_ble_gap_update_conn_params(&conn_params);
         break;
@@ -540,6 +568,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         ESP_LOGI(GATTS_TAG, "Disconnected, remote "ESP_BD_ADDR_STR", reason 0x%02x",
                  ESP_BD_ADDR_HEX(param->disconnect.remote_bda), param->disconnect.reason);
         esp_ble_gap_start_advertising(&adv_params);
+        notify_enabled = false;
         local_mtu = 512; // Reset MTU for a single connection
         break;
     case ESP_GATTS_CONF_EVT:
@@ -555,6 +584,29 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     case ESP_GATTS_CONGEST_EVT:
     default:
         break;
+    }
+}
+
+ void send_sensor_notification(){
+    if (!notify_enabled) return;
+
+    ESP_LOGW("send_sensor_notification", "Sending notification");
+    uint8_t notify_data[200] = {0};
+    int json_len = get_sensor_data_json((char *)notify_data, sizeof(notify_data));
+    esp_ble_gatts_send_indicate(
+        g_if,
+        g_conn_id,
+        gl_profile_tab[PROFILE_A_APP_ID].char_handle,
+        json_len,
+        notify_data,
+        false);
+}
+
+
+void sensor_notify_task(void *pvParameter) {
+    while (1) {
+        send_sensor_notification();
+        vTaskDelay(pdMS_TO_TICKS(500)); // Every 2 seconds
     }
 }
 
@@ -619,5 +671,9 @@ void BLEinit(void)
     if (local_mtu_ret){
         ESP_LOGE(GATTS_TAG, "set local  MTU failed, error code = %x", local_mtu_ret);
     }
-    return;
+    // return;
+
+    xTaskCreate(sensor_notify_task, "sensor_notify_task", 4096, NULL, 5, NULL);
 }
+
+
