@@ -31,6 +31,9 @@
 #define ID_SLAVE_DATA                   0x0B1
 #define ID_SLAVE_PING_RESP              0x0B2
 
+// #define TWAI_DEBUG
+
+
 static const twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(TX_GPIO_NUM, RX_GPIO_NUM, TWAI_MODE_NO_ACK);
 static const twai_timing_config_t t_config = TWAI_TIMING_CONFIG_25KBITS();
 static const twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
@@ -73,10 +76,13 @@ void master_task(void *arg)
     while(1){
     for (int iter = 0; iter < NO_OF_ITERS; iter++) {
         ESP_ERROR_CHECK(twai_start());
+
+#ifdef TWAI_DEBUG
         ESP_LOGI(EXAMPLE_TAG, "Driver started");
         
         // Step 1: Send Ping to slave
         ESP_LOGI(EXAMPLE_TAG, "Sending ping to slave");
+#endif
         ESP_ERROR_CHECK(twai_transmit(&ping_message, pdMS_TO_TICKS(1000)));
         
         // Step 2: Wait for ping response from slave
@@ -90,11 +96,16 @@ void master_task(void *arg)
         // }
         
         // Step 3: Send Start Command
+#ifdef TWAI_DEBUG
         ESP_LOGI(EXAMPLE_TAG, "Sending start command");
+#endif
+
         ESP_ERROR_CHECK(twai_transmit(&start_cmd, pdMS_TO_TICKS(1000)));
         
         // Step 4: Send data for a while
+#ifdef TWAI_DEBUG
         ESP_LOGI(EXAMPLE_TAG, "Sending data to slave");
+#endif
 
         //     #define JSON_BUFFER_SIZE 256
         // char json_buffer[JSON_BUFFER_SIZE];
@@ -174,7 +185,10 @@ void master_task(void *arg)
             memcpy(field_msg.data, field_buffer, len);
             esp_err_t err = twai_transmit(&field_msg, pdMS_TO_TICKS(1000));
             if (err == ESP_OK) {
-                ESP_LOGI(EXAMPLE_TAG, "Sent field: %s", field_buffer);
+#ifdef TWAI_DEBUG  
+                // ESP_LOGI(EXAMPLE_TAG, "Sent field: %s", field_buffer);
+#endif
+
             } else {
                 ESP_LOGE(EXAMPLE_TAG, "Failed to send field %s, err=0x%x", fields[i].key, err);
             }
@@ -183,7 +197,9 @@ void master_task(void *arg)
         }
         
         // Step 5: Send Stop Command
+#ifdef TWAI_DEBUG  
         ESP_LOGI(EXAMPLE_TAG, "Sending stop command");
+#endif
         ESP_ERROR_CHECK(twai_transmit(&stop_cmd, pdMS_TO_TICKS(1000)));
 
         // Step 6: Wait for stop response from slave
@@ -195,7 +211,9 @@ void master_task(void *arg)
         // }
         
         ESP_ERROR_CHECK(twai_stop());
+#ifdef TWAI_DEBUG  
         ESP_LOGI(EXAMPLE_TAG, "Driver stopped");
+#endif
         vTaskDelay(pdMS_TO_TICKS(ITER_DELAY_MS));
     }
 
@@ -279,5 +297,5 @@ void NMEA_init(void)
     ESP_LOGI(EXAMPLE_TAG, "TWAI driver installed");
     
     xTaskCreatePinnedToCore(master_task, "master_task", 4096, NULL, 10, NULL, tskNO_AFFINITY);
-    
+     
 }

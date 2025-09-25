@@ -6,6 +6,7 @@
 #include "driver/gpio.h"
 #include "ble_handler.h"
 #include "NMEA2000.h"
+#include "esp_log.h"
 
 #define I2C_ENABLE GPIO_NUM_33
 
@@ -29,6 +30,10 @@ void ads111x_test(void *pvParameters)
         readSCL();
         readGND();
         readVCC();
+        
+        ESP_LOGI("MAIN" , "VOLT_SIG = %d  ,SWITCH = %d ,tach_value = %d ,tilt_trim_value = %d ,oil_press_value = %d PSI ,coolant_value = %d ,warning = %d, fuel_1 = %d %%, fuel_2 = %d %% ,starter= %d" ,
+            VOLT_SIG ,SWITCH ,tach_value ,tilt_trim_value ,oil_press_value ,coolant_value ,warning ,fuel_1 ,fuel_2 ,starter);
+
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }

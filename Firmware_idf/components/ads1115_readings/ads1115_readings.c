@@ -88,14 +88,14 @@ void readSCL()
         float voltage = (VOLT_SIG / 32767.0) * 6.15f;
         voltage = voltage * 1.4f ;
 
-        printf("AIN0 (VOLT Signal) value: %d, voltage: %.02f volts\n", VOLT_SIG, voltage);
+        // printf("AIN0 (VOLT Signal) value: %d, voltage: %.02f volts\n", VOLT_SIG, voltage);
     }
 
     ads111x_set_input_mux(&devicesSCL, ADS111X_MUX_1_GND);
     vTaskDelay(pdMS_TO_TICKS(100));
     if (ads111x_get_value(&devicesSCL, &SWITCH) == ESP_OK)
     {
-        printf("AIN1 Switch : %d\n", SWITCH);
+        // printf("AIN1 Switch : %d\n", SWITCH);
     }
 }
 
@@ -115,10 +115,10 @@ void readGND()
             {
                 case 0: tach_value = val; break;
                 case 1: tilt_trim_value = val; break;
-                case 2: oil_press_value = val; break;
+                case 2: oil_press_value = ADC_TO_PSI(val); break;
                 case 3: coolant_value = val; break;
             }
-            printf("AIN%d (%s) value: %d\n", i, labels[i], val);
+            // printf("AIN%d (%s) value: %d\n", i, labels[i], val);
         }
     }
 }
@@ -135,18 +135,18 @@ void readVCC()
         vTaskDelay(pdMS_TO_TICKS(100));
         if (ads111x_get_value(&devicesVCC, &val) == ESP_OK)
         {
-            printf("AIN%d (%s) value: %d\n", i, labels[i], val);
+            // printf("AIN%d (%s) value: %d\n", i, labels[i], val);
             switch (i)
             {
                 case 0: warning = val; break;
-                case 1: fuel_1 = val; break;
-                case 2: fuel_2 = val; break;
+                case 1: fuel_1 = FUEL_PERCENT_NA_RAW(val); break;
+                case 2: fuel_2 = FUEL_PERCENT_NA_RAW(val); break;
                 case 3: starter = val; break;
             }
         }
     }
 }
-
+    
 int get_sensor_data_json(char *buffer, size_t size)
 {
     return snprintf(buffer, size,
