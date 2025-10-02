@@ -1,5 +1,5 @@
 {
-    "idf.espIdfPathWin": "C:\\Users\\eSpark\\esp\\v5.4.1\\esp-idf",
+    "idf.espIdfPathWin": "C:\\Users\\eSpark\\esp\\v5.4.2\\esp-idf",
     "idf.toolsPathWin": "C:\\Users\\eSpark\\.espressif",
     "idf.pythonInstallPath": "C:\\Users\\eSpark\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
     "files.associations": {
@@ -30,8 +30,10 @@
         "charconv": "c",
         "expected": "c",
         "format": "c",
-        "i2cdev.h": "c"
+        "i2cdev.h": "c",
+        "nmea2000.h": "c"
     },
     "idf.portWin": "COM5",
-    "idf.flashType": "UART"
+    "idf.flashType": "UART",
+    "C_Cpp.errorSquiggles": "enabled"
 }

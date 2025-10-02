@@ -593,6 +593,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     ESP_LOGW("send_sensor_notification", "Sending notification");
     uint8_t notify_data[200] = {0};
     int json_len = get_sensor_data_json((char *)notify_data, sizeof(notify_data));
+
     esp_ble_gatts_send_indicate(
         g_if,
         g_conn_id,
