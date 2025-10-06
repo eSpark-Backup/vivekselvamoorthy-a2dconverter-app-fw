@@ -31,9 +31,10 @@
         "expected": "c",
         "format": "c",
         "i2cdev.h": "c",
-        "nmea2000.h": "c"
+        "nmea2000.h": "c",
+        "stdatomic.h": "c"
     },
     "idf.portWin": "COM5",
     "idf.flashType": "UART",
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "disabled"
 }

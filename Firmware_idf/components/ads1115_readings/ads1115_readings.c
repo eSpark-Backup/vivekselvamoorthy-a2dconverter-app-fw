@@ -266,23 +266,6 @@ Lookup coolant_temp[] = { //
     {120, 2003 } // 120 degrees C on 2003 adc value // 33 ohms
 };
 
-
-// Below table is for example purpose only. Replace with actual values.
-// Lookup table for tachometer (voltage to RPM)
-// Lookup tach_table[] = {
-//    {800,    33},     // ~0.004V
-//   {1200,  1487},    // ~0.093V
-//   {1600,  3140},    // ~0.196V
-//   {2000,  4432},    // ~0.278V
-//   {2400,  6387},    // ~0.400V
-//   {2800,  7981},    // ~0.502V
-//   {3200,  9603},    // ~0.604V
-//   {3600, 11127},    // ~0.698V
-//   {4200, 12921},    // ~0.813V
-//   {5000, 14884},    // ~0.933V
-//   {6000, 16544}     // ~1.037V
-// };
-
 // Function to get fuel level percentage based on voltage reading
 int16_t get_fuel_level(int16_t value) {
     if(fuel_sensor_type == 'A'){
