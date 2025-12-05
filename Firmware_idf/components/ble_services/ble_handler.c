@@ -241,11 +241,19 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         ESP_LOGI(GATTS_TAG, "Advertising start successfully");
         break;
     case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
-        if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
+        // if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
+        //     ESP_LOGE(GATTS_TAG, "Advertising stop failed, status %d", param->adv_stop_cmpl.status);
+        //     break;
+        // }
+        // ESP_LOGI(GATTS_TAG, "Advertising stop successfully");
+
+        if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS) {
             ESP_LOGE(GATTS_TAG, "Advertising stop failed, status %d", param->adv_stop_cmpl.status);
             break;
         }
-        ESP_LOGI(GATTS_TAG, "Advertising stop successfully");
+        ESP_LOGI(GATTS_TAG, "Advertising stopped, restarting...");
+        esp_ble_gap_start_advertising(&adv_params);
+        // break;
         break;
     case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT:
          ESP_LOGI(GATTS_TAG, "Connection params update, status %d, conn_int %d, latency %d, timeout %d",

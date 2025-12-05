@@ -16,6 +16,7 @@
 int16_t VOLT_SIG = 0;
 int16_t SWITCH = 0;
 int16_t tach_value = 0;
+int16_t rpm_display = 0;
 int16_t tilt_trim_value = 0;
 int16_t oil_press_value = 0;
 int16_t coolant_value = 0;
@@ -78,7 +79,7 @@ void init_ads1115()
     ads111x_set_gain(&devicesGND, GAIN);
     ads111x_set_gain(&devicesVCC, GAIN);
 
-    fuel_sensor_type = 'E'; // Example: Assign 'E' for European
+    // fuel_sensor_type = 'E'; // Example: Assign 'E' for European
 }
 
 void readSCL()
@@ -357,8 +358,8 @@ void readGND()
             {
                 case 0: tach_value = val; break;
                 case 1: tilt_trim_value = get_tilt_trim(val); break;
-                case 2: oil_press_value = val; break;
-                // case 2: oil_press_value = get_oil_pressure(val); break;
+                // case 2: oil_press_value = val; break;
+                case 2: oil_press_value = get_oil_pressure(val); break;
                 // case 3: coolant_value = val; break;
                 case 3: coolant_value = get_coolant_temp(val); break;
             }
@@ -396,6 +397,7 @@ void readVCC()
     
 int get_sensor_data_json(char *buffer, size_t size)
 {
+    tach_value = rpm_display;
     return snprintf(buffer, size,
         "{"
         "\"VOLT_SIG\":%d,"

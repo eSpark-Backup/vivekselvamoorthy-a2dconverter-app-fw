@@ -8,6 +8,7 @@
 extern int16_t VOLT_SIG;
 extern int16_t SWITCH;
 extern int16_t tach_value;
+extern int16_t rpm_display;
 extern int16_t tilt_trim_value;
 extern int16_t oil_press_value;
 extern int16_t coolant_value;

@@ -94,7 +94,7 @@ int read_tach_GPIO(uint32_t last_total, int64_t last_time){
         if (rpm_ema == 0.0f) rpm_ema = raw_rpm;
         else rpm_ema = EMA_ALPHA * raw_rpm + (1.0f - EMA_ALPHA) * rpm_ema;
 
-        int rpm_display = (int)(rpm_ema + 0.5f);
+        rpm_display = (int)(rpm_ema + 0.5f);
 
         // Overspeed with hysteresis
         if (!overspeed_state && rpm_display >= OVERSPEED_LIMIT) {

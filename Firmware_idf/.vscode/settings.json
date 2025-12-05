@@ -34,7 +34,7 @@
         "nmea2000.h": "c",
         "stdatomic.h": "c"
     },
-    "idf.portWin": "COM5",
+    "idf.portWin": "COM11",
     "idf.flashType": "UART",
     "C_Cpp.errorSquiggles": "disabled"
 }
