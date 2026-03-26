@@ -14,6 +14,7 @@
 #define FREQ_HZ 400000
 
 int16_t VOLT_SIG = 0;
+float voltage_by_ads;
 int16_t SWITCH = 0;
 int16_t tach_value = 0;
 int16_t rpm_display = 0;
@@ -24,13 +25,15 @@ int16_t warning = 0;
 int16_t fuel_1 = 0;
 int16_t fuel_2 = 0;
 int16_t starter= 0;
+float starter_voltage= 0;
 char fuel_sensor_type = 'A'; // 'A' for American, 'E' for European
 
 
 #define CONFIG_EXAMPLE_I2C_MASTER_SCL GPIO_NUM_22
 #define CONFIG_EXAMPLE_I2C_MASTER_SDA GPIO_NUM_21
 
-#define GAIN ADS111X_GAIN_2V048
+// #define GAIN ADS111X_GAIN_2V048
+#define GAIN ADS111X_GAIN_6V144
 #define DATA_RATE ADS111X_DATA_RATE_128
 #define MODE ADS111X_MODE_CONTINUOUS
 
@@ -42,7 +45,7 @@ static float gain_val;
 
 void init_ads1115()
 {
-    gain_val = ads111x_gain_values[GAIN];
+    // gain_val = ads111x_gain_values[GAIN];
 
     // Initialize descriptors
     devicesSCL = (i2c_dev_t){
@@ -90,11 +93,28 @@ void readSCL()
     ads111x_set_input_mux(&devicesSCL, ADS111X_MUX_0_GND);
     vTaskDelay(pdMS_TO_TICKS(100));
     if (ads111x_get_value(&devicesSCL, &VOLT_SIG) == ESP_OK)
-    {
-        float voltage = (VOLT_SIG / 32767.0) * 6.15f;
-        voltage = voltage * 1.4f ;
-
+    {   
+        // voltage_by_ads = (VOLT_SIG / 32767.0) * 6.15f;
+        // voltage_by_ads = voltage_by_ads * 1.4f ;
+        voltage_by_ads = (VOLT_SIG * 6.144f) / 32767.0f;  // ADS voltage
+        // voltage_by_ads = voltage_by_ads * ((39.0f + 100.0f) / 100.0f); // undo divider
+        // voltage_by_ads = voltage_by_ads * 3.57f;
         // printf("AIN0 (VOLT Signal) value: %d, voltage: %.02f volts\n", VOLT_SIG, voltage);
+        if (voltage_by_ads < 1.5f){
+            voltage_by_ads = voltage_by_ads * 3.57f;
+        }
+        else if(voltage_by_ads < 2.0f){
+            voltage_by_ads = voltage_by_ads * 3.67f;
+        }
+        else if(voltage_by_ads < 2.5f){
+            voltage_by_ads = voltage_by_ads * 3.87f;
+        }
+        else if(voltage_by_ads < 2.72f){
+            voltage_by_ads = voltage_by_ads * 4.4f;
+        }
+        else{
+            voltage_by_ads = voltage_by_ads * 4.85f;
+        }
     }
 
     ads111x_set_input_mux(&devicesSCL, ADS111X_MUX_1_GND);
@@ -363,7 +383,7 @@ void readGND()
                 // case 3: coolant_value = val; break;
                 case 3: coolant_value = get_coolant_temp(val); break;
             }
-            // printf("AIN%d (%s) value: %d\n", i, labels[i], val);
+            printf("AIN%d (%s) value: %d\n", i, labels[i], val);
         }
     }
 }
@@ -389,7 +409,15 @@ void readVCC()
                 // case 1: fuel_1 = FUEL_PERCENT_NA_RAW(val); break;
                 case 2: fuel_2 = get_fuel_level(val); break;
                 // case 2: fuel_2 = FUEL_PERCENT_NA_RAW(val); break;
-                case 3: starter = val; break;
+                
+                case 3: {
+                    starter = val; 
+                    starter_voltage = (val * 6.144f) / 32767.0f;
+                    starter_voltage = starter_voltage * 3.57f;
+                }
+                
+                break;
+                printf("AIN%d (%s) value: %d\n", i, labels[i], val);
             }
         }
     }
@@ -400,7 +428,7 @@ int get_sensor_data_json(char *buffer, size_t size)
     tach_value = rpm_display;
     return snprintf(buffer, size,
         "{"
-        "\"VOLT_SIG\":%d,"
+        "\"VOLT_SIG\":%.2f,"
         "\"SWITCH\"  :%d,"
         "\"TACH\"    :%d,"
         "\"TILT_TRM\":%d,"
@@ -411,9 +439,24 @@ int get_sensor_data_json(char *buffer, size_t size)
         "\"FUEL_2\"  :%d,"
         "\"STARTER\" :%d"
         "}",
-        VOLT_SIG, SWITCH, tach_value, tilt_trim_value,
+        voltage_by_ads, SWITCH, tach_value, tilt_trim_value,
         oil_press_value, coolant_value, warning,
         fuel_1, fuel_2, starter);
+        
+        /*
+        {
+            "VOLT_SIG": 13,
+            "SWITCH": 1,
+            "TACH": 2870,
+            "TILT_TRM": 42,
+            "OIL_PRES": 78,
+            "COOLANT": 92,
+            "WARNING": 0,
+            "FUEL_1": 54,
+            "FUEL_2": 31,
+            "STARTER": 0
+        }
+  */
     //  return snprintf(buffer, size, "This is a test string from ESP32");
 }
 

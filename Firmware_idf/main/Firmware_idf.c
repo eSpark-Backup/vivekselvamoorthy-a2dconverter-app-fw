@@ -140,8 +140,8 @@ void ads111x_test(void *pvParameters)
         readVCC();
         tach_value = read_tach_GPIO(lastTotal, lastTime);
 
-        ESP_LOGI("MAIN" , "VOLT_SIG = %d  ,SWITCH = %d ,tach_value = %d RPM, tilt_trim_value = %d ,oil_press_value = %d PSI ,coolant_value = %d degrees C,warning = %d, fuel_1 = %d %%, fuel_2 = %d %% ,starter= %d" ,
-            VOLT_SIG ,SWITCH ,tach_value ,tilt_trim_value ,oil_press_value ,coolant_value ,warning ,fuel_1 ,fuel_2 ,starter);
+        ESP_LOGI("MAIN" , "VOLT_SIG = %d, voltage_by_ads = %.2f  ,SWITCH = %d ,tach_value = %d RPM, tilt_trim_value = %d ,oil_press_value = %d PSI ,coolant_value = %d degrees C,warning = %d, fuel_1 = %d %%, fuel_2 = %d %% ,starter= %.2f" ,
+            VOLT_SIG, voltage_by_ads, SWITCH, tach_value, tilt_trim_value, oil_press_value, coolant_value, warning, fuel_1, fuel_2, starter_voltage);
 
         vTaskDelay(pdMS_TO_TICKS(500));
     }

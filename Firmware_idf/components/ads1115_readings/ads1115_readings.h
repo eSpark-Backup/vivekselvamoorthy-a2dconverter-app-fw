@@ -5,6 +5,7 @@
 
 #include "ads111x.h"
 
+extern float voltage_by_ads;
 extern int16_t VOLT_SIG;
 extern int16_t SWITCH;
 extern int16_t tach_value;
@@ -17,6 +18,7 @@ extern int16_t warning;
 extern int16_t fuel_1;
 extern int16_t fuel_2;
 extern int16_t starter;
+extern float starter_voltage;
 extern char fuel_sensor_type; // 'A' for American, 'E' for European
 
 

@@ -34,7 +34,8 @@
         "nmea2000.h": "c",
         "stdatomic.h": "c"
     },
-    "idf.portWin": "COM11",
+    "idf.portWin": "COM10",
     "idf.flashType": "UART",
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "idf.currentSetup": "C:\\Users\\eSpark\\esp\\v5.4.2\\esp-idf"
 }
